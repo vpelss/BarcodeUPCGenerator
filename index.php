@@ -1,4 +1,4 @@
-<?
+<?php
 
 function getvar($name){
     global $_GET, $_POST;
@@ -7,11 +7,8 @@ function getvar($name){
     else return false;
 }
 
-if (get_magic_quotes_gpc()){
-    $bdata=stripslashes(getvar('bdata'));
-} else {
-    $bdata=getvar('bdata');
-}
+$bdata=getvar('bdata');
+
 if (!$bdata) $bdata='123456789012';
 ?>
 
@@ -29,14 +26,14 @@ $type="png";
 
 //if(isset($_POST['Genrate']))
 {
-        if (getvar('encode')) $encode=getvar(encode);
-        if (getvar('bdata')) $bdata=getvar(bdata);
-        if (getvar('height')) $height=getvar(height);
-        if (getvar('scale')) $scale=getvar(scale);
-        if (getvar('bgcolor')) $bgcolor=getvar(bgcolor);
-        if (getvar('color')) $color=getvar(color);
-        if (getvar('file')) $file=getvar(file);
-        if (getvar('type')) $type=getvar(type);
+        if (getvar('encode')) $encode=getvar('encode');
+        if (getvar('bdata')) $bdata=getvar('bdata');
+        if (getvar('height')) $height=getvar('height');
+        if (getvar('scale')) $scale=getvar('scale');
+        if (getvar('bgcolor')) $bgcolor=getvar('bgcolor');
+        if (getvar('color')) $color=getvar('color');
+        //if (getvar('file')) $file=getvar('file');
+        if (getvar('type')) $type=getvar('type');
 }
 
 ?>
@@ -66,10 +63,7 @@ input {
 <BODY>
 <SCRIPT LANGUAGE="JavaScript" SRC="checkcode.js"></SCRIPT>
 
-<center>
-<a href="/"><img src="http://www.somewhereincanada.com/sites/default/files/steve2.jpg">
-</a>
-</center>
+
 
 <P></P>
 

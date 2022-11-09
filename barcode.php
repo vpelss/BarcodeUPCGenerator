@@ -3,23 +3,23 @@
 
 	$encode=$_REQUEST['encode'];
 	$bar= new BARCODE();
-	
+
 	if($bar==false)
 		die($bar->error());
 	// OR $bar= new BARCODE("I2O5");
 
 	$barnumber=$_REQUEST['bdata'];
 	//scriptman remove all but numbers
-	//ereg_replace("[^0-9]", "", $barnumber); 
-	$barnumber = preg_replace("/\D/","",$barnumber); 
-	
+	//ereg_replace("[^0-9]", "", $barnumber);
+	$barnumber = preg_replace("/\D/","",$barnumber);
+
 	//$barnumber="200780";
 	//$barnumber="801221905";
 	//$barnumber="A40146B";
 	//$barnumber="Code 128";
 	//$barnumber="TEST8052";
 	//$barnumber="TEST93";
-	
+
 	$bar->setSymblogy($encode);
 	$bar->setHeight($_REQUEST['height']);
 	$bar->setFont("arial");
@@ -37,10 +37,10 @@
 	//$bar->setBGColor(0,0,0)   RGB Color
 
   	//mod scriptman no file writing allowed
-	//$return = $bar->genBarCode($barnumber,$_REQUEST['type'],$_REQUEST['file']); 
+	//$return = $bar->genBarCode($barnumber,$_REQUEST['type'],$_REQUEST['file']);
 	$return = $bar->genBarCode($barnumber,$_REQUEST['type'],"");
-	
+
 	if($return==false)
 		$bar->error(true);
-	
+
 ?>

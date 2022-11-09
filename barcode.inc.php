@@ -4,23 +4,23 @@
 	// ConvertUPCAtoUPCE<b></b>
 	// Author :Harish Chauhan
 	// Created : 7July 2005
-	// 
+	//
 	//########################//
 
 	/*
 	* This class is for generating barcodes in diffrenct encoding symbologies.
 	* It supports EAN-13,EAN-8,UPC-A,UPC-E,ISBN ,2 of 5 Symbologies(std,ind,interleaved),postnet,
 	* codabar,code128,code39,code93 symbologies.
-	* 
+	*
 	* This program is distributed in the hope that it will be useful,
 	* but WITHOUT ANY WARRANTY; without even the implied warranty of
 	* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-	* 
-	* Requirements : PHP with GD library support. 
-	* 
+	*
+	* Requirements : PHP with GD library support.
+	*
 	* Reference : http://www.barcodeisland.com/symbolgy.phtml
 	*/
-	
+
 	class BARCODE
 	{
 		var $_encode;
@@ -33,10 +33,10 @@
 		var $_bgcolor;
 		var $_format;
 		var $_n2w;
-		
-		function BARCODE($encoding="EAN-13")
+
+		function _BARCODE($encoding="EAN-13")
 		{
-			
+
 			if(!function_exists("imagecreate"))
 			{
 				die("This class needs GD library support.");
@@ -50,7 +50,7 @@
 			$this->_n2w=2;
 			$this->_height=60;
 			$this->_format='png';
-			
+
 			//mod scriptman
 		    //$this->_font=dirname($_SERVER["PATH_TRANSLATED"])."/"."arialbd.ttf";
 		    $whereami = realpath(dirname(__FILE__));
@@ -63,16 +63,16 @@
 			$this->setHexColor("#000000","#FFFFFF");
 		}
 
-		function setFont($font,$autolocate=false)
+		function setFont($font,$autolocate=true)
 		{
 			$this->_font=$font;
 			if($autolocate)
-			{  
+			{
 			 	//mod scriptman
 				//$this->_font=dirname($_SERVER["PATH_TRANSLATED"])."/".$font.".ttf";
 				$whereami = realpath(dirname(__FILE__));
 				$this->_font = $whereami . "/".$font.".ttf";
-			
+
 				if (isset($_SERVER['WINDIR']) && file_exists($_SERVER['WINDIR']))
 				   $this->_font=$_SERVER['WINDIR']."\Fonts\\".$font.".ttf";
 			}
@@ -82,15 +82,15 @@
 		{
 			$this->_encode=strtoupper($encoding);
 		}
-		
+
 		function setHexColor($color,$bgcolor)
 		{
 		 	//scriptman strip all but char and digits then add #
-		 	//$color = preg_replace("/^\w/","",$color);  
-		 	//$bgcolor = preg_replace("/^\w/","",$bgcolor); 
+		 	//$color = preg_replace("/^\w/","",$color);
+		 	//$bgcolor = preg_replace("/^\w/","",$bgcolor);
 		 	//$color = '#' . $color;
 		 	//$bgcolor = '#' . $bgcolor;
-		 	
+
 			$this->setColor(hexdec(substr($color,1,2)),hexdec(substr($color,3,2)),hexdec(substr($color,5,2)));
 		$this->setBGColor(hexdec(substr($bgcolor,1,2)),hexdec(substr($bgcolor,3,2)),hexdec(substr($bgcolor,5,2)));
 		}
@@ -104,12 +104,12 @@
 		{
 			$this->_bgcolor=array($red,$green,$blue);
 		}
-		
+
 		function setScale($scale)
 		{
 			$this->_scale=$scale;
 		}
-		
+
 		function setFormat($format)
 		{
 			$this->_format=strtolower($format);
@@ -126,14 +126,14 @@
 				$n2w=3;
 			$this->_n2w=$n2w;
 		}
-		
+
 		function error($asimg=false)
 		{
 			if(empty($this->_error))
 				return "";
 			if(!$asimg)
 				return $this->_error;
-			
+
 
 			@header("Content-type: image/png");
 			$im=@imagecreate(250,100);
@@ -210,35 +210,35 @@
 				$this->_i25Barcode($barnumber,$this->_scale,$file);
 			}
 			elseif($this->_encode=="POSTNET" )
-			{ 
+			{
 				$this->_postBarcode($barnumber,$this->_scale,$file);
 			}
 			elseif($this->_encode=="CODABAR" )
-			{ 
+			{
 				$this->_codaBarcode($barnumber,$this->_scale,$file);
 			}
 			elseif($this->_encode=="CODE128" )
-			{ 
+			{
 				$this->_c128Barcode($barnumber,$this->_scale,$file);
 			}
 			elseif($this->_encode=="CODE39" )
-			{ 
+			{
 				$this->_c39Barcode($barnumber,$this->_scale,$file,false);
 			}
 			elseif($this->_encode=="CODE93" )
-			{ 
+			{
 				$this->_c93Barcode($barnumber,$this->_scale,$file);
 			}
 		}
-		
+
 		/// Start function for code93
-		
+
 		/*A Code 39 barcode has the following structure:
 
-		A start character , represented below by the asterisk (*) character. 
-		Any number of characters encoded from the table below. 
-		The "C" and "K" checksum digits calculated as described above and encoded using the table below. 
-		A stop character, which is a second asterisk character. 
+		A start character , represented below by the asterisk (*) character.
+		Any number of characters encoded from the table below.
+		The "C" and "K" checksum digits calculated as described above and encoded using the table below.
+		A stop character, which is a second asterisk character.
 		*/
 
 		function _c93Encode($barnumber)
@@ -296,7 +296,7 @@
 			$mfcStr="";
 			$widebar=str_pad("",$this->_n2w,"1",STR_PAD_LEFT);
 			$widespc=str_pad("",$this->_n2w,"0",STR_PAD_LEFT);
-			
+
 			$arr_key=array_keys($encTable);
 			/// calculating C And K
 
@@ -324,23 +324,23 @@
 						$num=42;
 					elseif($num=='*')
 						$num=43;
-					
-					$sum+=$i*$num;	
-				}	
+
+					$sum+=$i*$num;
+				}
 				$barnumber.=trim($arr_key[(int)($sum % 47)]);
 			}
 
 			$barnumber="*".$barnumber."*";
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
 				$mfcStr.=$encTable[$barnumber[$i]];
 			}
 			$mfcStr.='1';
-			
+
 			return $mfcStr;
 		}
-				
+
 		function _c93Barcode($barnumber,$scale=1,$file="",$checkdigit=false)
 		{
 			$bars=$this->_c93Encode($barnumber);
@@ -349,26 +349,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height+10*$scale;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars)+2*$scale*10; 
+
+			$xpos=$scale*strlen($bars)+2*$scale*10;
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left']+$scale*10;
-	
+
 		    $height=floor($total_y-($scale*20));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -378,12 +378,12 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
+
 			$font_arr=@imagettfbbox ( $scale*10, 0, $this->_font, $barnumber);
-			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;	
+			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;
 			@imagettftext($im,$scale*10,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -413,12 +413,12 @@
 		/// End functions for code93
 
 		/// Start function for code39
-		
+
 		/*A Code 39 barcode has the following structure:
 
-		A start character - the asterisk (*) character. 
-		Any number of characters encoded from the table below. 
-		An optional checksum digit calculated as described above and encoded from the table below. 
+		A start character - the asterisk (*) character.
+		Any number of characters encoded from the table below.
+		An optional checksum digit calculated as described above and encoded from the table below.
 		A stop character, which is a second asterisk character. */
 
 		function _c39Encode($barnumber,$checkdigit=false)
@@ -472,7 +472,7 @@
 			$mfcStr="";
 			$widebar=str_pad("",$this->_n2w,"1",STR_PAD_LEFT);
 			$widespc=str_pad("",$this->_n2w,"0",STR_PAD_LEFT);
-			
+
 			if($checkdigit==true)
 			{
 				$arr_key=array_keys($encTable);
@@ -497,19 +497,19 @@
 						$num=42;
 					elseif($num=='*')
 						$num=43;
-					$sum+=$num;	
-				}	
+					$sum+=$num;
+				}
 				$barnumber.=trim($arr_key[(int)($sum % 43)]);
 			}
 
 			$barnumber="*".$barnumber."*";
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
 				$tmp=$encTable[$barnumber[$i]];
 
 				$bar =true;
-				
+
 				for($j=0;$j<strlen($tmp);$j++)
 				{
 					if($tmp[$j]=='N' && $bar)
@@ -524,10 +524,10 @@
 				}
 				$mfcStr.='0';
 			}
-			
+
 			return $mfcStr;
 		}
-				
+
 		function _c39Barcode($barnumber,$scale=1,$file="",$checkdigit=false)
 		{
 			$bars=$this->_c39Encode($barnumber,$checkdigit);
@@ -536,26 +536,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height+10*$scale;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars)+2*$scale*10; 
+
+			$xpos=$scale*strlen($bars)+2*$scale*10;
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left']+$scale*10;
-	
+
 		    $height=floor($total_y-($scale*20));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -565,12 +565,12 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
+
 			$font_arr=@imagettfbbox ( $scale*10, 0, $this->_font, $barnumber);
-			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;	
+			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;
 			@imagettftext($im,$scale*10,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -598,7 +598,7 @@
 			@imagedestroy($im);
 		}
 		/// End functions for code39
-		
+
 		///Start function for code128
 		function _c128Encode($barnumber,$useKeys)
 		{
@@ -612,7 +612,7 @@
 			if($useKeys=='C')
 			{
 				for($i=0;$i<strlen($barnumber);$i+=2)
-				{ 
+				{
 					$val=substr($barnumber,$i,2);
 					if(is_int($val))
 						$sum+=($i+1)*(int)($val);
@@ -626,7 +626,7 @@
 			else
 			{
 				for($i=0;$i<strlen($barnumber);$i++)
-				{ 
+				{
 					$num=ord($barnumber[$i]);
 					if($num>=32 && $num<=126)
 						$num=ord($barnumber[$i])-32;
@@ -662,7 +662,7 @@
 				if(strlen($barnumber)%2 != 0)
 					$barnumber='0'.$barnumber;
 			}
-			
+
 			for($i=0;$i<32;$i++)
 				$chr=chr($i);
 			if(preg_match("/[".$chr."]+/",$barnumber))
@@ -674,26 +674,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height+10*$scale;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars)+2*$scale*10; 
+
+			$xpos=$scale*strlen($bars)+2*$scale*10;
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left']+$scale*10;
-	
+
 		    $height=floor($total_y-($scale*20));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -703,12 +703,12 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
+
 			$font_arr=@imagettfbbox ( $scale*10, 0, $this->_font, $barnumber);
-			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;	
+			$x= floor($total_x-(int)$font_arr[0]-(int)$font_arr[2]+$scale*10)/2;
 			@imagettftext($im,$scale*10,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -736,16 +736,16 @@
 			@imagedestroy($im);
 		}
 		///End function for codabar
-		
+
 
 		///Start function for codabar
-		
+
 		/*
 		A Code 11 Barcode has the following structure:
 
-		One of four possible start characters (A, B, C, or D), encoded from the table below. 
-		A narrow, inter-character space. 
-		The data of the message, encoded from the table below, with a narrow inter-character space between each character. 
+		One of four possible start characters (A, B, C, or D), encoded from the table below.
+		A narrow, inter-character space.
+		The data of the message, encoded from the table below, with a narrow inter-character space between each character.
 		One of four possible stop characters (A, B, C, or D), encoded from the table below
 		*/
 
@@ -755,10 +755,10 @@
 			$chrTable=array("-" => "0001100","$" => "0011000",":" => "1000101","/" => "1010001","." => "1010100", "+" => "0011111","A" => "0011010","B" => "0001011","C" => "0101001","D" => "0001110");
 
 			$mfcStr="";
-			
+
 			$widebar=str_pad("",$this->_n2w,"1",STR_PAD_LEFT);
 			$widespc=str_pad("",$this->_n2w,"0",STR_PAD_LEFT);
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
 				if(preg_match("/[0-9]+/",$barnumber[$i]))
@@ -767,7 +767,7 @@
 					$tmp=$chrTable[strtoupper(trim($barnumber[$i]))];
 
 				$bar =true;
-				
+
 				for($j=0;$j<strlen($tmp);$j++)
 				{
 					if($tmp[$j]=='0' && $bar)
@@ -783,10 +783,10 @@
 				}
 				$mfcStr.='0';
 			}
-			
+
 			return $mfcStr;
 		}
-		
+
 		function _codaBarcode($barnumber,$scale=1,$file="")
 		{
 
@@ -796,26 +796,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars); 
+
+			$xpos=$scale*strlen($bars);
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left'];
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -825,12 +825,12 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
 
-			$x= ($total_x-strlen($bars))/2;	
+
+			$x= ($total_x-strlen($bars))/2;
 			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -864,21 +864,21 @@
 		/*
 		A PostNet barcode has the following structure:
 
-		Frame bar, encoded as a single 1. 
-		5, 9, or 11 data characters properly encoded (see encoding table below). 
-		Check digit, encoded using encoding table below. 
-		Final frame bar, encoded as a single 1. 
+		Frame bar, encoded as a single 1.
+		5, 9, or 11 data characters properly encoded (see encoding table below).
+		Check digit, encoded using encoding table below.
+		Final frame bar, encoded as a single 1.
 
-		0		 11000 
-		1		 00011 
-		2		 00101 
-		3		 00110 
-		4		 01001 
-		5		 01010 
-		6		 01100 
-		7		 10001 
-		8		 10010 
-		9		 10100 
+		0		 11000
+		1		 00011
+		2		 00101
+		3		 00110
+		4		 01001
+		5		 01010
+		6		 01100
+		7		 10001
+		8		 10010
+		9		 10100
 		*/
 
 		function _postEncode($barnumber)
@@ -894,7 +894,7 @@
 			}
 			if($sum%10!=0)
 				$check=(int)(10-($sum%10));
-			
+
 			$encstr.=$encTable[$check];
 			$encstr="1".$encstr."1";
 			return $encstr;
@@ -916,26 +916,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars)*2; 
+
+			$xpos=$scale*strlen($bars)*2;
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left'];
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$val=strtoupper($bars[$i]);
@@ -947,8 +947,8 @@
 					@imagefilledrectangle($im,$xpos,floor($height2/1.5) ,$xpos+$scale-1, $height2,$bar_color);
 				$xpos+=2*$scale;
 			}
-			
-			
+
+
 
 			if($this->_format=="png")
 			{
@@ -979,24 +979,24 @@
 		// End Function for POSTNET
 
 		// Start Function for INTERLEAVED
-		
+
 		/*A Standard 2 of 5 barcode has the following physical structure:
 
-		Start character, encoded as 11011010. 
-		Data characters properly encoded (see encoding table below). 
-		Stop character, encoded as 11010110. 
-		
+		Start character, encoded as 11011010.
+		Data characters properly encoded (see encoding table below).
+		Stop character, encoded as 11010110.
+
 		ASCII	BARCODE
-		0		 NNWWN 
-		1		 WNNNW 
-		2		 NWNNW 
-		3		 WWNNN 
-		4		 NNWNW 
-		5		 WNWNN 
-		6		 NWWNN 
-		7		 NNNWW 
-		8		 WNNWN 
-		9		 NWNWN 
+		0		 NNWWN
+		1		 WNNNW
+		2		 NWNNW
+		3		 WWNNN
+		4		 NNWNW
+		5		 WNWNN
+		6		 NWWNN
+		7		 NNNWW
+		8		 WNNWN
+		9		 NWNWN
 		*/
 
 		function _i25Encode($barnumber)
@@ -1011,12 +1011,12 @@
 				if($len==strlen($barnumber) && substr($barnumber,-1)!='0')
 					$barnumber.='0';
 			}
-			
+
 			$mfcStr="";
-			
+
 			$widebar=str_pad("",$this->_n2w,"1",STR_PAD_LEFT);
 			$widespc=str_pad("",$this->_n2w,"0",STR_PAD_LEFT);
-			
+
 			for($i=0;$i<strlen($barnumber);$i+=2)
 			{
 				$tmp=$encTable[(int)$barnumber[$i]];
@@ -1034,10 +1034,10 @@
 						$mfcStr.=$widespc;
 				}
 			}
-			
+
 			return $guards[0].$mfcStr.$guards[1];
 		}
-		
+
 		function _i25Barcode($barnumber,$scale=1,$file="")
 		{
 
@@ -1047,26 +1047,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars); 
+
+			$xpos=$scale*strlen($bars);
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left'];
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -1076,13 +1076,13 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
-			
 
-			$x= ($total_x-strlen($bars))/2;	
+
+
+			$x= ($total_x-strlen($bars))/2;
 			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -1109,28 +1109,28 @@
 
 			@imagedestroy($im);
 		}
-		
+
 		// End Function for INTERLEAVED
 
 		// Start Function for S2O5
-		
+
 		/*A Standard 2 of 5 barcode has the following physical structure:
 
-		Start character, encoded as 11011010. 
-		Data characters properly encoded (see encoding table below). 
-		Stop character, encoded as 11010110. 
-		
+		Start character, encoded as 11011010.
+		Data characters properly encoded (see encoding table below).
+		Stop character, encoded as 11010110.
+
 		ASCII	BARCODE
-		0		 NNWWN 
-		1		 WNNNW 
-		2		 NWNNW 
-		3		 WWNNN 
-		4		 NNWNW 
-		5		 WNWNN 
-		6		 NWWNN 
-		7		 NNNWW 
-		8		 WNNWN 
-		9		 NWNWN 
+		0		 NNWWN
+		1		 WNNNW
+		2		 NWNNW
+		3		 WWNNN
+		4		 NNWNW
+		5		 WNWNN
+		6		 NWWNN
+		7		 NNNWW
+		8		 WNNWN
+		9		 NWNWN
 		*/
 
 		function _so25Encode($barnumber)
@@ -1142,24 +1142,24 @@
 			$barnumber=$this->_checkDigit($barnumber,$len);
 			if($len==strlen($barnumber) && substr($barnumber,-1)!='0')
 				$barnumber.='0';
-			
+
 			$mfcStr="";
-			
+
 			$widebar=str_pad("",$this->_n2w,"1",STR_PAD_LEFT);
 			$widebar.="0";
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
-				$num=(int)$barnumber{$i};
+				$num=(int)$barnumber[$i];
 				$str="";
 				$str=str_replace("N","10",$encTable[$num]);
 				$str=str_replace("W",$widebar,$str);
 				$mfcStr.=$str;
 			}
-			
+
 			return $guards[0].$mfcStr.$guards[1];
 		}
-		
+
 		function _so25Barcode($barnumber,$scale=1,$file="")
 		{
 
@@ -1169,26 +1169,26 @@
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars); 
+
+			$xpos=$scale*strlen($bars);
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left'];
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -1198,13 +1198,13 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
-			
 
-			$x= ($total_x-strlen($bars))/2;	
+
+
+			$x= ($total_x-strlen($bars))/2;
 			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -1231,12 +1231,12 @@
 
 			@imagedestroy($im);
 		}
-		
+
 		// End Function for S2O5
 
-		
+
 		///Start Functions from UPCE Encoding
-		
+
 		function ConvertUPCAtoUPCE($upca)
 		{
 			 $csumTotal = 0; // The checksum working variable starts at zero
@@ -1245,7 +1245,7 @@
 
 			 if( strlen($upca) < 12 )
 			 {
-				$barnumber = str_pad($barnumber, 12, "0", STR_PAD_LEFT);  
+				$barnumber = str_pad($barnumber, 12, "0", STR_PAD_LEFT);
 			 }
 
 			 if( substr($upca,0,1) != '0' && substr($upca,0,1) != '1')
@@ -1276,10 +1276,10 @@
 		{
 			$leftOdd=array("0001101","0011001","0010011","0111101","0100011","0110001","0101111","0111011","0110111","0001011");
 			$leftEven=array("0100111","0110011","0011011","0100001","0011101","0111001","0000101","0010001","0001001","0010111");
-			
+
 			$encTable0=array("EEEOOO","EEOEOO","EEOOEO","EEOOOE","EOEEOO","EOOEEO","EOOOEE","EOEOEO","EOEOOE","EOOEOE");
 			$encTable1=array("OOOEEE","OOEOEE","OOEEOE","OOEEEO","OEOOEE","OEEOOE","OEEEOO","OEOEOE","OEOEEO","OEEOEO");
-			
+
 		    $guards=array("bab","ababa","b");
 
 
@@ -1289,7 +1289,7 @@
 				$encTable=$encTable1;
 			else
 			{
-				$this->_error="Not an UPC-E barcode number";	
+				$this->_error="Not an UPC-E barcode number";
 				return false;
 			}
 
@@ -1297,10 +1297,10 @@
 			$prodStr="";
 			$checkdigit;
 			$encTable[$checkdigit];
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
-				$num=(int)$barnumber{$i};
+				$num=(int)$barnumber[$i];
 				$even=(substr($encTable[$checkdigit],$i,1)=='E');
 				if(!$even)
 					$mfcStr.=$leftOdd[$num];
@@ -1310,14 +1310,14 @@
 
 			return $guards[0].$mfcStr.$guards[1].$guards[2];
 		}
-		
+
 		function _upceBarcode($barnumber,$scale=1,$file="")
 		{
 
 			//mod scriptman. only accept a full eight char upc-e a checksum
 			/*
 			if(strlen($barnumber)>6)
-			{	
+			{
 				$this->_ean13CheckDigit($barnumber);
 				$barnumber=substr($this->_ean13CheckDigit($barnumber),1);
 				$encbit=$barnumber[0];
@@ -1326,19 +1326,19 @@
 			}
 			else
 			{
-				$barnumber=$this->_checkDigit($barnumber,7); 
+				$barnumber=$this->_checkDigit($barnumber,7);
 				$encbit=$barnumber[0];
 				$checkdigit=$barnumber[7];
 				$barnumber=substr($barnumber,1,6);
 			}
 			*/
-			
+
 			if(strlen($barnumber) == 8)
-			{	
+			{
 				//$barnumber=$this->_checkDigit($barnumber,7); mod scriptman
 				//$barnumber=
 				$this->_upcEcheckDigit($barnumber,7);
-				
+
 				$encbit=$barnumber[0];
 				$checkdigit=$barnumber[7];
 				$barnumber=substr($barnumber,1,6);
@@ -1348,33 +1348,33 @@
 				$this->_error = 'UPC-E is not 8 characters';
 				return false;
 			}
-			
+
 			$bars=$this->_upceEncode($barnumber,$encbit,$checkdigit);
 			if(empty($file))
 				header("Content-type: image/".$this->_format);
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars)+$scale*12; 
+
+			$xpos=$scale*strlen($bars)+$scale*12;
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left']+($scale*6);
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -1389,18 +1389,18 @@
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
-			
+
+
 
 			@imagettftext($im,$scale*6,0, $space['left'], $height, $bar_color,$this->_font , $encbit);
 
-			
-			$x= $space['left']+$scale*strlen($barnumber)+$scale*6;	
+
+			$x= $space['left']+$scale*strlen($barnumber)+$scale*6;
 			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $barnumber);
 
 			$x=$total_x-$space['left']-$scale*6;
 			@imagettftext($im,$scale*6,0, $x, $height, $bar_color,$this->_font , $checkdigit);
-			
+
 			if($this->_format=="png")
 			{
 				if(!empty($file))
@@ -1427,9 +1427,9 @@
 
 			@imagedestroy($im);
 		}
-		
+
 		//End UPC-E functions
-	
+
 function _upcEcheckDigit($barnumber,$number) //scriptman new
 		{
 			 $csumTotal = 0; // The checksum working variable starts at zero
@@ -1440,45 +1440,45 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 				{
 				$lastchar = substr($barnumber, -1);
 				//$newbarnumber =  $barnumber[0]; //start with prefix number
-				if ($lastchar == "0")					
+				if ($lastchar == "0")
 					{
-					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . "00000" . $barnumber[3] . $barnumber[4] . $barnumber[5];					
+					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . "00000" . $barnumber[3] . $barnumber[4] . $barnumber[5];
 					}
-				if ($lastchar == "1")					
+				if ($lastchar == "1")
 					{
-					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] .  "10000" . $barnumber[3] . $barnumber[4] . $barnumber[5];					
+					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] .  "10000" . $barnumber[3] . $barnumber[4] . $barnumber[5];
 					}
-				if ($lastchar == "2")					
+				if ($lastchar == "2")
 					{
-					$newbarnumber =  $barnumber[0] . "0" .$barnumber[1] . $barnumber[2] . "20000" . $barnumber[3] . $barnumber[4] . $barnumber[5];					
+					$newbarnumber =  $barnumber[0] . "0" .$barnumber[1] . $barnumber[2] . "20000" . $barnumber[3] . $barnumber[4] . $barnumber[5];
 					}
-				if ($lastchar == "3")					
+				if ($lastchar == "3")
 					{
-					$newbarnumber = $barnumber[0] .  "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . "00000" . $barnumber[4] . $barnumber[5];					
+					$newbarnumber = $barnumber[0] .  "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . "00000" . $barnumber[4] . $barnumber[5];
 					}
-				if ($lastchar == "4")					
+				if ($lastchar == "4")
 					{
-					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . "00000" . $barnumber[5];					
+					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . "00000" . $barnumber[5];
 					}
-				if ($lastchar == "5")					
+				if ($lastchar == "5")
 					{
-					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00005";					
+					$newbarnumber =  $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00005";
 					}
-				if ($lastchar == "6")					
+				if ($lastchar == "6")
 					{
-					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00006";					
+					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00006";
 					}
-				if ($lastchar == "7")					
+				if ($lastchar == "7")
 					{
-					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00007";					
+					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00007";
 					}
-				if ($lastchar == "8")					
+				if ($lastchar == "8")
 					{
-					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00008";					
+					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00008";
 					}
-				if ($lastchar == "9")					
+				if ($lastchar == "9")
 					{
-					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00009";					
+					$newbarnumber = $barnumber[0] . "0" . $barnumber[1] . $barnumber[2] . $barnumber[3] . $barnumber[4] . $barnumber[5] . "00009";
 					}
 				$barnumber = $newbarnumber;
 				}
@@ -1486,17 +1486,17 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			 // if(strlen($barnumber) < $number)
 			 elseif(strlen($barnumber) < $number)
 			  {
-				$barnumber = str_pad($barnumber, $number, "0", STR_PAD_LEFT);  
+				$barnumber = str_pad($barnumber, $number, "0", STR_PAD_LEFT);
 			  }
-			  
+
 			 // Calculate the checksum value for the message
-			
-			 for($i=0;$i<strlen($barnumber);$i++) 
+
+			 for($i=0;$i<strlen($barnumber);$i++)
 			  {
 				  if($i % 2 == 0 )
-					   $csumTotal = $csumTotal + (3 * intval($barnumber{$i+1}));
+					   $csumTotal = $csumTotal + (3 * intval($barnumber[$i+1]));
 				  else
-					   $csumTotal = $csumTotal + intval($barnumber{$i+1});
+					   $csumTotal = $csumTotal + intval($barnumber[$i+1]);
 			  }
 
 			 // Calculate the checksum digit
@@ -1505,12 +1505,12 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 				$checksumDigit = '';
 			 else
 				$checksumDigit = 10 - ($csumTotal % 10);
-			
+
 			 return $barnumber.$checksumDigit;
-		}	
-		
+		}
+
 		///Start Functions from EAN-8 Encoding
-		
+
 		function _checkDigit($barnumber,$number)
 		{
 			 $csumTotal = 0; // The checksum working variable starts at zero
@@ -1518,17 +1518,17 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			 // If the source message string is less than 12 characters long, we make it 12 characters
 			 if(strlen($barnumber) < $number)
 			  {
-				$barnumber = str_pad($barnumber, $number, "0", STR_PAD_LEFT);  
+				$barnumber = str_pad($barnumber, $number, "0", STR_PAD_LEFT);
 			  }
-			  
+
 			 // Calculate the checksum value for the message
-			
-			 for($i=0;$i<strlen($barnumber);$i++) 
+
+			 for($i=0;$i<strlen($barnumber);$i++)
 			  {
 				  if($i % 2 == 0 )
-					   $csumTotal = $csumTotal + (3 * intval($barnumber{$i}));
+					   $csumTotal = $csumTotal + (3 * intval($barnumber[$i]));
 				  else
-					   $csumTotal = $csumTotal + intval($barnumber{$i});
+					   $csumTotal = $csumTotal + intval($barnumber[$i]);
 			  }
 
 			 // Calculate the checksum digit
@@ -1542,13 +1542,13 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 		/*An EAN-8 barcode has the following physical structure:
 
-		Left-hand guard bars, or start sentinel, encoded as 101. 
-		Two number system characters, encoded as left-hand odd-parity characters. 
-		First two message characters, encoded as left-hand odd-parity characters. 
-		Center guard bars, encoded as 01010. 
-		Last three message characters, encoded as right-hand characters. 
-		Check digit, encoded as right-hand character. 
-		Right-hand guar bars, or end sentinel, encoded as 101. 
+		Left-hand guard bars, or start sentinel, encoded as 101.
+		Two number system characters, encoded as left-hand odd-parity characters.
+		First two message characters, encoded as left-hand odd-parity characters.
+		Center guard bars, encoded as 01010.
+		Last three message characters, encoded as right-hand characters.
+		Check digit, encoded as right-hand character.
+		Right-hand guar bars, or end sentinel, encoded as 101.
 		*/
 
 		function _ean8Encode($barnumber)
@@ -1558,16 +1558,16 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			$rightAll=array("1110010","1100110","1101100","1000010","1011100","1001110","1010000","1000100","1001000","1110100");
 
 			$encTable=array("000000","001011","001101","001110","010011","011001","011100","010101","010110","011010");
-			
+
 		    $guards=array("bab","ababa","bab");
 
 			$mfcStr="";
 			$prodStr="";
-			
+
 			for($i=0;$i<strlen($barnumber);$i++)
 			{
-				$num=(int)$barnumber{$i};
-				if($i<4) 
+				$num=(int)$barnumber[$i];
+				if($i<4)
 				{
 					$mfcStr.=$leftOdd[$num];
 				}
@@ -1580,7 +1580,7 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 			return $guards[0].$mfcStr.$guards[1].$prodStr.$guards[2];
 		}
-		
+
 		function _ean8Barcode($barnumber,$scale=1,$file="")
 		{
 			$barnumber=$this->_checkDigit($barnumber,7);
@@ -1590,26 +1590,26 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*strlen($bars); 
+
+			$xpos=$scale*strlen($bars);
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left'];
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
+
 			$im=@imagecreatetruecolor($total_x, $total_y);
 			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
+			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
 			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -1624,13 +1624,13 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
-			
+
+
 
 			$str=substr($barnumber,0,4);
-			$x= $space['left']+$scale*strlen($barnumber);	
+			$x= $space['left']+$scale*strlen($barnumber);
 			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $str);
-			
+
 			$str=substr($barnumber,4,4);
 			$x=$space['left']+$scale*strlen($bars)/1.65;
 			@imagettftext($im,$scale*6,0, $x, $height2, $bar_color,$this->_font ,$str);
@@ -1662,7 +1662,7 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			@imagedestroy($im);
 		}
 		////End functions fron EAN-8 Encoding
-		
+
 		///Start Functions from EAN-13 Encoding
 
 		function _ean13CheckDigit($barnumber)
@@ -1672,20 +1672,20 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			 // If the source message string is less than 12 characters long, we make it 12 characters
 			 if(strlen($barnumber) <= 12 )
 			  {
-				$barnumber = str_pad($barnumber, 13, "0", STR_PAD_LEFT);  
+				$barnumber = str_pad($barnumber, 13, "0", STR_PAD_LEFT);
 			  }
-			  
+
 			  /*if(strlen($barnumber) == 13)
 				$barnumber = substr($barnumber,0,12);*/
 
 			 // Calculate the checksum value for the message
-			
-			 for($i=0;$i<strlen($barnumber);$i++) 
+
+			 for($i=0;$i<strlen($barnumber);$i++)
 			  {
 				  if($i % 2 == 0 )
-					   $csumTotal = $csumTotal + intval($barnumber{$i});
+					   $csumTotal = $csumTotal + intval($barnumber[$i]);
 				  else
-					   $csumTotal = $csumTotal + (3 * intval($barnumber{$i}));
+					   $csumTotal = $csumTotal + (3 * intval($barnumber[$i]));
 			  }
 
 			 // Calculate the checksum digit
@@ -1699,29 +1699,29 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 		/*An EAN-13 barcode has the following physical structure:
 
-		Left-hand guard bars, or start sentinel, encoded as 101. 
-		The second character of the number system code, encoded as described below. 
-		The five characters of the manufacturer code, encoded as described below. 
-		Center guard pattern, encoded as 01010. 
-		The five characters of the product code, encoded as right-hand characters, described below. 
-		Check digit, encoded as a right-hand character, described below. 
-		Right-hand guard bars, or end sentinel, encoded as 101. 
+		Left-hand guard bars, or start sentinel, encoded as 101.
+		The second character of the number system code, encoded as described below.
+		The five characters of the manufacturer code, encoded as described below.
+		Center guard pattern, encoded as 01010.
+		The five characters of the product code, encoded as right-hand characters, described below.
+		Check digit, encoded as a right-hand character, described below.
+		Right-hand guard bars, or end sentinel, encoded as 101.
 		FIRST NUMBER
 
-		SYSTEM DIGIT PARITY TO ENCODE WITH 
+		SYSTEM DIGIT PARITY TO ENCODE WITH
 			SECOND NUMBER
-			SYSTEM DIGIT MANUFACTURER CODE CHARACTERS 
-						1	2	3	 4	5 
-		0 (UPC-A)	Odd	Odd	Odd	Odd	Odd	Odd 
-		1			Odd Odd Even Odd Even Even 
-		2			Odd Odd Even Even Odd Even 
-		3			Odd Odd Even Even Even Odd 
-		4			Odd Even Odd Odd Even Even 
-		5			Odd Even Even Odd Odd Even 
-		6			Odd Even Even Even Odd Odd 
-		7			Odd Even Odd Even Odd Even 
-		8			Odd Even Odd Even Even Odd 
-		9			Odd Even Even Odd Even Odd 
+			SYSTEM DIGIT MANUFACTURER CODE CHARACTERS
+						1	2	3	 4	5
+		0 (UPC-A)	Odd	Odd	Odd	Odd	Odd	Odd
+		1			Odd Odd Even Odd Even Even
+		2			Odd Odd Even Even Odd Even
+		3			Odd Odd Even Even Even Odd
+		4			Odd Even Odd Odd Even Even
+		5			Odd Even Even Odd Odd Even
+		6			Odd Even Even Even Odd Odd
+		7			Odd Even Odd Even Odd Even
+		8			Odd Even Odd Even Even Odd
+		9			Odd Even Even Odd Even Odd
 
 
 		*/
@@ -1733,18 +1733,18 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 			$rightAll=array("1110010","1100110","1101100","1000010","1011100","1001110","1010000","1000100","1001000","1110100");
 
 			$encTable=array("000000","001011","001101","001110","010011","011001","011100","010101","010110","011010");
-			
+
 		    $guards=array("bab","ababa","bab");
 
 			$mfcStr="";
 			$prodStr="";
-			
+
 			$encbit=$barnumber[0];
 
 			for($i=1;$i<strlen($barnumber);$i++)
 			{
-				$num=(int)$barnumber{$i};
-				if($i<7) 
+				$num=(int)$barnumber[$i];
+				if($i<7)
 				{
 					$even=(substr($encTable[$encbit],$i-1,1)==1);
 					if(!$even)
@@ -1761,7 +1761,7 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 			return $guards[0].$mfcStr.$guards[1].$prodStr.$guards[2];
 		}
-		
+
 		function _eanBarcode($barnumber,$scale=1,$file="")
 		{
 			$barnumber=$this->_ean13CheckDigit($barnumber);
@@ -1772,26 +1772,26 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 
 			if ($scale<1) $scale=2;
 			$total_y=(double)$scale * $this->_height;
-			if (!$space)
+			if (! isset($space))
 			  $space=array('top'=>2*$scale,'bottom'=>2*$scale,'left'=>2*$scale,'right'=>2*$scale);
-			
+
 			/* count total width */
 			$xpos=0;
-			
-			$xpos=$scale*(114); 
+
+			$xpos=$scale*(114);
 
 			/* allocate the image */
 			$total_x= $xpos +$space['left']+$space['right'];
 			$xpos=$space['left']+($scale*6);
-	
+
 		    $height=floor($total_y-($scale*10));
 		    $height2=floor($total_y-$space['bottom']);
-		
-			$im=@imagecreatetruecolor($total_x, $total_y);
-			$bg_color = @imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
-			@imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color); 
-			$bar_color = @imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
-	
+
+			$im=imagecreatetruecolor($total_x, $total_y);
+			$bg_color = imagecolorallocate($im, $this->_bgcolor[0], $this->_bgcolor[1],$this->_bgcolor[2]);
+			imagefilledrectangle($im,0,0,$total_x,$total_y,$bg_color);
+			$bar_color = imagecolorallocate($im, $this->_color[0], $this->_color[1],$this->_color[2]);
+
 			for($i=0;$i<strlen($bars);$i++)
 			{
 				$h=$height;
@@ -1805,62 +1805,63 @@ function _upcEcheckDigit($barnumber,$number) //scriptman new
 					$h=$height2;
 
 				if($val==1)
-					@imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
+					imagefilledrectangle($im,$xpos, $space['top'],$xpos+$scale-1, $h,$bar_color);
 				$xpos+=$scale;
 			}
-			
-			
+
 			if($this->_encode=="UPC-A")
 				$str=substr($barnumber,1,1);
 			else
 				$str=substr($barnumber,0,1);
 
-			@imagettftext($im,$scale*6,0, $space['left'], $height, $bar_color,$this->_font , $str);
+			imagettftext($im,$scale*6,0, $space['left'], $height, $bar_color,$this->_font , $str);
 
 			if($this->_encode=="UPC-A")
 				$str=substr($barnumber,2,5);
 			else
 				$str=substr($barnumber,1,6);
-			
-			$x= $space['left']+$scale*strlen($barnumber)+$scale*6;	
-			@imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $str);
-			
+
+			$x= $space['left']+$scale*strlen($barnumber)+$scale*6;
+			imagettftext($im,$scale*6,0,$x, $height2, $bar_color,$this->_font , $str);
+
 			if($this->_encode=="UPC-A")
 				$str=substr($barnumber,7,5);
 			else
 				$str=substr($barnumber,7,6);
 			$x=$space['left']+$scale*strlen($bars)/1.65+$scale*6;
-			@imagettftext($im,$scale*6,0, $x, $height2, $bar_color,$this->_font ,$str);
+			imagettftext($im,$scale*6,0, $x, $height2, $bar_color,$this->_font ,$str);
 
 			if($this->_encode=="UPC-A")
 			{
 				$str=substr($barnumber,12,1);
 				$x=$total_x-$space['left']-$scale*6;
-				@imagettftext($im,$scale*6,0, $x, $height, $bar_color,$this->_font , $str);
+				imagettftext($im,$scale*6,0, $x, $height, $bar_color,$this->_font , $str);
 			}
-			
+
+			$r;
 			if($this->_format=="png")
 			{
 				if(!empty($file))
 					@imagepng($im,$file.".".$this->_format);
 				else
-					@imagepng($im);
+					@imagepng($im,'huh'.".".$this->_format);
+					$r = imagepng($im);
 			}
 
 			if($this->_format=="gif")
 			{
 				if(!empty($file))
-					@imagegif($im,$file.".".$this->_format);
+					imagegif($im,$file.".".$this->_format);
 				else
-					@imagegif($im);
+					imagegif($im);
 			}
 
 			if($this->_format=="jpg" || $this->_format=="jpeg" )
 			{
 				if(!empty($file))
-					@imagejpeg($im,$file.".".$this->_format);
+					imagejpeg($im,$file.".".$this->_format);
 				else
-					@imagejpeg($im);
+					imagejpeg($im);
 			}
 
 			@imagedestroy($im);
